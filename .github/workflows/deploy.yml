@@ -118,8 +118,20 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ env.SUPABASE_DB_PASSWORD }}
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_REF"
-          supabase db push
-
+          # Auto-repair: capture push output; on failure extract remote-only
+          # migration versions from the error and mark them as reverted.
+          PUSH_OUTPUT=$(supabase db push 2>&1) && echo "$PUSH_OUTPUT" || {
+            echo "$PUSH_OUTPUT"
+            REPAIR_VERSION=$(echo "$PUSH_OUTPUT" | grep -oE "repair --status reverted [0-9]+" | grep -oE "[0-9]+" | head -1)
+            while [ -n "$REPAIR_VERSION" ]; do
+              echo "Repairing remote-only migration: $REPAIR_VERSION"
+              supabase migration repair --status reverted "$REPAIR_VERSION"
+              PUSH_OUTPUT=$(supabase db push 2>&1) && { echo "$PUSH_OUTPUT"; break; } || {
+                echo "$PUSH_OUTPUT"
+                REPAIR_VERSION=$(echo "$PUSH_OUTPUT" | grep -oE "repair --status reverted [0-9]+" | grep -oE "[0-9]+" | head -1)
+              }
+            done
+          }
       - name: Deploy edge functions
         if: env.SKIP_DEPLOY != 'true'
         run: |
