@@ -179,7 +179,7 @@ function App() {
           Ingredient Register
         </Badge>
         <h1 className="inked-title text-4xl text-slate-900 sm:text-5xl">
-          Keep your pantry inventory tidy4.
+          Keep your pantry inventory tidy10.
         </h1>
         <p className="max-w-3xl text-sm text-slate-600 sm:text-base">
           Add ingredients with category and quantity, then remove them when
