@@ -79,7 +79,6 @@ jobs:
               echo "SUPABASE_ANON_KEY=${{ secrets.DEV_SUPABASE_ANON_KEY }}" >> "$GITHUB_ENV"
               echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.DEV_SUPABASE_SERVICE_ROLE_KEY }}" >> "$GITHUB_ENV"
               echo "VERCEL_ENVIRONMENT=preview" >> "$GITHUB_ENV"
-              echo "VERCEL_ALIAS=project-supabase-example-main.vercel.app" >> "$GITHUB_ENV"
               ;;
             staging)
               echo "DEPLOY_ENV=staging" >> "$GITHUB_ENV"
@@ -89,7 +88,6 @@ jobs:
               echo "SUPABASE_ANON_KEY=${{ secrets.STAGING_SUPABASE_ANON_KEY }}" >> "$GITHUB_ENV"
               echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.STAGING_SUPABASE_SERVICE_ROLE_KEY }}" >> "$GITHUB_ENV"
               echo "VERCEL_ENVIRONMENT=preview" >> "$GITHUB_ENV"
-              echo "VERCEL_ALIAS=project-supabase-example-staging.vercel.app" >> "$GITHUB_ENV"
               ;;
             production)
               echo "DEPLOY_ENV=prod" >> "$GITHUB_ENV"
@@ -182,7 +180,3 @@ jobs:
             --meta deploymentEnvironment="$DEPLOY_ENV")
 
           echo "DEPLOYMENT_URL=$DEPLOYMENT_URL" >> "$GITHUB_ENV"
-
-      - name: Alias preview deployment
-        if: env.SKIP_DEPLOY != 'true' && env.VERCEL_ALIAS != ''
-        run: pnpm dlx vercel@latest alias "$DEPLOYMENT_URL" "$VERCEL_ALIAS" --token "$VERCEL_TOKEN"
